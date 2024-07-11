@@ -1,0 +1,85 @@
+#  == File: nagios-client.yml
+#
+# Install & Configure Nagios Client
+#
+#  == Copyright
+#     All Rights Reserved
+#
+# --------------------------------------------------------------------------
+# WARNING: This file belongs to the Core framework. Avoid any local changes
+# --------------------------------------------------------------------------
+#
+# This file is Managed by ANSIBLE
+# --------------------------------------------------------------------------
+
+
+    - name: "Copy Nagios Client Bash File"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/nagios-client.sh"
+        dest: /etc/
+        owner: root
+        group: root
+        mode: '755'
+
+    - name: Execute the bash script
+      command: sudo sh /etc/nagios-client.sh
+
+    - name: "Copy Nagios NRPE .cfg File"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/nrpe.cfg"
+        dest: /usr/local/nagios/etc/
+
+    - name: Execute the script
+      command: sudo chown -R nagios:nagios /usr/local/nagios
+
+    - name: Execute the script
+      command: sudo chmod -R 0755 /usr/local/nagios
+
+    - name: Start and Enable nrpe Service
+      systemd:
+        name: nrpe
+        state: restarted
+        enabled: yes
+
+
+# Customised Plugins
+
+    - name: "Copy Customised Nagios Plugin Files"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/check_disk_uses.sh"
+        dest: /usr/local/nagios/libexec/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Customised Nagios Plugin Files"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/check_reboot.sh"
+        dest: /usr/local/nagios/libexec/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Customised Nagios Plugin Files"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/check_loki.sh"
+        dest: /usr/local/nagios/libexec/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Customised Nagios Plugin Files"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/check_promtail.sh"
+        dest: /usr/local/nagios/libexec/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Customised Nagios Plugin Files"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/check_mssql.sh"
+        dest: /usr/local/nagios/libexec/
+        owner: nagios
+        group: nagios
+        mode: '755'
