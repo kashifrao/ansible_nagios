@@ -1,0 +1,131 @@
+  == File: nagios-server.yml
+#
+# Install & Configure Nagios Server
+#
+#  == Copyright
+#     All Rights Reserved
+#
+# --------------------------------------------------------------------------
+# WARNING: This file belongs to the Core framework. Avoid any local changes
+# --------------------------------------------------------------------------
+#
+# This file is Managed by ANSIBLE
+# --------------------------------------------------------------------------
+
+
+    - name: "Setting/Copying up Nagios Hist List "
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/create_nagios_host_list.py"
+        dest: /opt/mgmtUtil/
+        owner: root
+        group: root
+        mode: '755'
+
+    - name: Execute the nagios host list script
+      command: sudo /opt/mgmtUtil/create_nagios_host_list.py
+
+    - name: "Copy Nagios Server Bash File"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/nagios-server.sh"
+        dest: /etc/
+        owner: root
+        group: root
+        mode: '755'
+
+    - name: Execute the bash script
+      command: sudo sh /etc/nagios-server.sh
+
+    - name: "Copy Nagios Nagios .cfg File"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/nagios.cfg"
+        dest: /usr/local/nagios/etc/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Nagios Command .cfg File"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/commands.cfg"
+        dest: /usr/local/nagios/etc/objects/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Nagios Contacts .cfg File"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/contacts.cfg"
+        dest: /usr/local/nagios/etc/objects/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Nagios Templates .cfg File"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/templates.cfg"
+        dest: /usr/local/nagios/etc/objects/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Nagios Server Host .cfg File"
+      template:
+        src:  "{{ansible_roles_path}}/files/nagios/yourhost.cfg.j2"
+        dest: /usr/local/nagios/etc/servers/{{ item.nagios_host_name }}.cfg
+      loop: "{{nagios_client}}"
+
+
+    - name: Execute the script
+      command: sudo chown -R nagios:nagios /usr/local/nagios
+
+    - name: Execute the script
+      command: sudo chmod -R 0755 /usr/local/nagios
+
+
+    - name: Start and Enable Nagios Service
+      systemd:
+        name: nagios
+        state: restarted
+        enabled: yes
+
+        
+# Customised Plugins
+
+    - name: "Copy Customised Nagios Plugin Files"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/check_disk_uses.sh"
+        dest: /usr/local/nagios/libexec/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Customised Nagios Plugin Files"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/check_reboot.sh"
+        dest: /usr/local/nagios/libexec/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Customised Nagios Plugin Files"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/check_loki.sh"
+        dest: /usr/local/nagios/libexec/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Customised Nagios Plugin Files"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/check_promtail.sh"
+        dest: /usr/local/nagios/libexec/
+        owner: nagios
+        group: nagios
+        mode: '755'
+
+    - name: "Copy Customised Nagios Plugin Files"
+      copy:
+        src:  "{{ansible_roles_path}}/files/nagios/check_mssql.sh"
+        dest: /usr/local/nagios/libexec/
+        owner: nagios
+        group: nagios
+        mode: '755'
